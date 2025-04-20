@@ -1,39 +1,45 @@
 # -*- coding: utf-8 -*-
-# Created on Sat Apr 19 21:19:26 2025
-# @author: Nongnuch
-
 import streamlit as st
-import pickle
+import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.datasets import make_blobs
+from sklearn.cluster import KMeans
+from sklearn.datasets import load_iris
+from sklearn.decomposition import PCA
 
-# Load model
-with open("kmeans_model.pkl", "rb") as f:
-    loaded_model = pickle.load(f)
+# Page config
+st.set_page_config(page_title="K-Means Clustering App with Iris", layout="wide")
 
-# Set the page config
-st.set_page_config(page_title="K-Means Clustering App", layout="centered")
+# Title
+st.title("🔍 K-Means Clustering App with Iris Dataset")
 
-# Set title
-st.title("🔍 K-Means Clustering Visualizer")
+# Load data
+iris = load_iris()
+X = iris.data
+y = iris.target
+feature_names = iris.feature_names
 
-# Display cluster centers
-st.subheader("📊 Example Data for Visualization")
-st.markdown("This demo uses example data (2D) to illustrate clustering results.")
+# Sidebar
+st.sidebar.header("⚙️ Configure Clustering")
+k = st.sidebar.slider("Select number of clusters (K)", min_value=2, max_value=10, value=3)
 
-# Load from a saved dataset or generate synthetic data
-X, _ = make_blobs(n_samples=300, centers=loaded_model.n_clusters, cluster_std=0.60, random_state=0)
+# K-Means clustering
+model = KMeans(n_clusters=k, random_state=42)
+y_kmeans = model.fit_predict(X)
 
-# Predict using the loaded model
-y_kmeans = loaded_model.predict(X)
+# Reduce dimensions using PCA
+pca = PCA(n_components=2)
+X_reduced = pca.fit_transform(X)
 
 # Plotting
 fig, ax = plt.subplots()
-scatter = ax.scatter(X[:, 0], X[:, 1], c=y_kmeans, s=50, cmap='viridis')
-centers = loaded_model.cluster_centers_
-ax.scatter(centers[:, 0], centers[:, 1], c='black', s=200, alpha=0.75, marker='X')
-ax.set_title("Clusters (2D Projection)")
-ax.set_xlabel("Feature 1")
-ax.set_ylabel("Feature 2")
+scatter = ax.scatter(X_reduced[:, 0], X_reduced[:, 1], c=y_kmeans, cmap='tab10', s=50)
+centers_reduced = pca.transform(model.cluster_centers_)
+ax.scatter(centers_reduced[:, 0], centers_reduced[:, 1], c='black', s=200, marker='X', label='Centroids')
+ax.set_title("Clusters (2D PCA Projection)")
+ax.set_xlabel("PCA 1")
+ax.set_ylabel("PCA 2")
+ax.legend(*scatter.legend_elements(), title="Cluster")
 
+# Show plot
 st.pyplot(fig)
