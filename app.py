@@ -10,41 +10,41 @@ from sklearn.decomposition import PCA
 st.set_page_config(page_title="K-Means Clustering App with Iris", layout="centered")
 
 # App title
-st.markdown("<h2 style='text-align: center;'>🔍 K-Means Clustering App with Iris Dataset</h2>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>🔍 K-Means Clustering App with Iris Dataset</h1>", unsafe_allow_html=True)
 
 # Sidebar
 st.sidebar.header("⚙️ Configure Clustering")
-k = st.sidebar.slider("Select number of clusters (K)", min_value=2, max_value=10, value=4)
+k = st.sidebar.slider("Select number of clusters (K)", min_value=2, max_value=10, value=3)
 
-# Load dataset
+# Load Iris dataset
 iris = load_iris()
 X = iris.data
+feature_names = iris.feature_names
 
-# Apply KMeans
+# K-Means model
 model = KMeans(n_clusters=k, random_state=42)
 y_kmeans = model.fit_predict(X)
 
-# Reduce to 2D with PCA
+# PCA for visualization
 pca = PCA(n_components=2)
 X_pca = pca.fit_transform(X)
 centers_pca = pca.transform(model.cluster_centers_)
 
-# Plotting (adjust size)
-fig, ax = plt.subplots(figsize=(6, 4))  # ⬅️ Smaller figure size
-scatter = ax.scatter(X_pca[:, 0], X_pca[:, 1], c=y_kmeans, cmap='tab10', s=40)
+# Plotting
+fig, ax = plt.subplots()
+scatter = ax.scatter(X_pca[:, 0], X_pca[:, 1], c=y_kmeans, cmap='tab10', s=50)
 
-# Plot centroids
-ax.scatter(centers_pca[:, 0], centers_pca[:, 1], c='black', s=100, marker='X', label='Centroids')
 
-# Labeling
-ax.set_title("Clusters (2D PCA Projection)", fontsize=12)
-ax.set_xlabel("PCA1", fontsize=10)
-ax.set_ylabel("PCA2", fontsize=10)
 
-# Legend
-handles, _ = scatter.legend_elements()
-labels = [f"Cluster {i}" for i in range(k)]
-ax.legend(handles, labels, title="Clusters", fontsize=9)
+# Labels & title
+ax.set_title("Clusters (2D PCA Projection)")
+ax.set_xlabel("PCA1")
+ax.set_ylabel("PCA2")
 
-# Show plot
+# Add legend with cluster labels
+handles, labels = scatter.legend_elements()
+labels = [f"Cluster {i}" for i in range(len(handles))]
+ax.legend(handles, labels, title="Clusters")
+
+# Show plot in Streamlit
 st.pyplot(fig)
