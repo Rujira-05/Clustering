@@ -1,8 +1,6 @@
-# -- coding: utf-8 --
-"""
-Created on Sun Apr 20 15:43:46 2025
-@author: LAB
-"""
+# -*- coding: utf-8 -*-
+# Created on Sat Apr 19 21:19:26 2025
+# @author: Nongnuch
 
 import streamlit as st
 import pickle
@@ -10,32 +8,32 @@ import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 
 # Load model
-with open('kmeans_model.pkl', 'rb') as f:
+with open("kmeans_model.pkl", "rb") as f:
     loaded_model = pickle.load(f)
 
-# Page config
-st.set_page_config(page_title="k-Means Clustering App", layout="centered")
-st.title("🔍 k-Means Clustering Visualizer")
+# Set the page config
+st.set_page_config(page_title="K-Means Clustering App", layout="centered")
+
+# Set title
+st.title("🔍 K-Means Clustering Visualizer")
+
+# Display cluster centers
 st.subheader("📊 Example Data for Visualization")
 st.markdown("This demo uses example data (2D) to illustrate clustering results.")
 
-# Generate data
+# Load from a saved dataset or generate synthetic data
 X, _ = make_blobs(n_samples=300, centers=loaded_model.n_clusters, cluster_std=0.60, random_state=0)
 
-# Predict
+# Predict using the loaded model
 y_kmeans = loaded_model.predict(X)
 
-# Plot
-plt.figure(figsize=(8, 6))
-plt.scatter(X[:, 0], X[:, 1], c=y_kmeans, s=50, cmap='viridis')
-
-# Plot centroids
+# Plotting
+fig, ax = plt.subplots()
+scatter = ax.scatter(X[:, 0], X[:, 1], c=y_kmeans, s=50, cmap='viridis')
 centers = loaded_model.cluster_centers_
-plt.scatter(centers[:, 0], centers[:, 1], c='red', s=300, alpha=0.9, label='Centroids')
+ax.scatter(centers[:, 0], centers[:, 1], c='black', s=200, alpha=0.75, marker='X')
+ax.set_title("Clusters (2D Projection)")
+ax.set_xlabel("Feature 1")
+ax.set_ylabel("Feature 2")
 
-# Add legend and title
-plt.title("k-Means Clustering")
-plt.legend(loc='upper right')
-
-# Show in Streamlit
-st.pyplot(plt)
+st.pyplot(fig)
