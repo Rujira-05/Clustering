@@ -34,8 +34,7 @@ centers_pca = pca.transform(model.cluster_centers_)
 fig, ax = plt.subplots()
 scatter = ax.scatter(X_pca[:, 0], X_pca[:, 1], c=y_kmeans, cmap='tab10', s=50)
 
-# Plot centroids
-ax.scatter(centers_pca[:, 0], centers_pca[:, 1], c='black', s=200, marker='X', label='Centroids')
+
 
 # Labels & title
 ax.set_title("Clusters (2D PCA Projection)")
